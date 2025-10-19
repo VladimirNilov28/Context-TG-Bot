@@ -8,11 +8,10 @@ router = Router(name="debug")
 
 @router.message(F.text == "/debug")
 async def cmd_debug(msg: Message):
-    # Точное подключение, куда бот реально смотрит
     with engine.connect() as c:
-        row = c.execute(text("SELECT current_database(), inet_server_addr(), inet_server_port()")).one()
-        db, addr, port = row[0], str(row[1]), row[2]
-
+        db, addr, port = c.execute(
+            text("SELECT current_database(), inet_server_addr(), inet_server_port()")
+        ).one()
     with get_session() as s:
         counts = s.execute(text("""
             SELECT
