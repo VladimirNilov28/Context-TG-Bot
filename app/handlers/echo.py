@@ -1,9 +1,8 @@
-from aiogram import Router
+from aiogram import Router, F
 from aiogram.types import Message
 
 router = Router(name="echo")
 
-@router.message()
+@router.message(F.text)  # ← было @router.message()
 async def echo_any(msg: Message):
-    # просто подтверждаем получение, позже сюда добавим загрузку файлов
     await msg.answer("Принято. Для поиска используй /ask <вопрос>")

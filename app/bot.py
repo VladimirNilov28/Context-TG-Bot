@@ -7,7 +7,8 @@ from app.handlers import start as h_start
 from app.handlers import help as h_help
 from app.handlers import ask as h_ask
 from app.handlers import echo as h_echo
-from app.handlers import debug as h_debug  # <-- новый
+from app.handlers import debug as h_debug
+from app.handlers import upload as h_upload
 
 async def on_startup(bot: Bot):
     await bot.set_my_commands(
@@ -27,8 +28,10 @@ async def main():
     dp.include_router(h_start.router)
     dp.include_router(h_help.router)
     dp.include_router(h_ask.router)
-    dp.include_router(h_debug.router)  # <-- подключили
+    dp.include_router(h_debug.router)
+    dp.include_router(h_upload.router)
     dp.include_router(h_echo.router)
+    
     await on_startup(bot)
     await dp.start_polling(bot)
 
