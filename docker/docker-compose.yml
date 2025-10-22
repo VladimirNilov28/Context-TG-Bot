@@ -1,3 +1,5 @@
+version: "3.9"
+
 services:
   db:
     image: pgvector/pgvector:pg16
@@ -16,20 +18,46 @@ services:
       timeout: 3s
       retries: 10
 
+  ollama:
+    image: ollama/ollama:latest
+    container_name: ollama
+    restart: unless-stopped
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama_data:/root/.ollama
+    environment:
+      - OLLAMA_KEEP_ALIVE=24h
+      - NVIDIA_VISIBLE_DEVICES=all
+      - NVIDIA_DRIVER_CAPABILITIES=compute,utility
+    gpus: all
+    healthcheck:
+      test: ["CMD", "ollama", "list"]
+      interval: 10s
+      timeout: 5s
+      retries: 30
+
+
   app:
     build:
       context: ../app
-      dockerfile: Dockerfile 
+      dockerfile: Dockerfile
     container_name: tg_app
     restart: unless-stopped
+    working_dir: /                 
     env_file:
       - ./.env
     depends_on:
       db:
         condition: service_healthy
+      ollama:
+        condition: service_healthy
     volumes:
       - ../app:/app
-    command: ["python", "-m", "app.main"]
+    environment:
+      - PYTHONPATH=/               
+    command: ["python", "-m", "app.bot"]   
 
 volumes:
   db_data:
+  ollama_data:
